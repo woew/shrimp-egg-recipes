@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虾蛋菜谱 - 可爱动漫美食世界</title>
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Comic+Neue:wght@300;400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header class="header">
+        <div class="container">
+            <div class="logo">
+                <h1>🦐🥚 虾蛋菜谱</h1>
+                <p class="tagline">记录每一道美味的虾蛋料理</p>
+            </div>
+            <button class="add-btn" id="addRecipeBtn">
+                <span class="btn-icon">+</span>
+                添加新菜谱
+            </button>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main">
+        <div class="container">
+            <!-- 搜索和筛选区域 -->
+            <section class="controls">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="搜索菜谱名称..." class="search-input">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="sort-controls">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="createdAt-desc">最新创建</option>
+                        <option value="createdAt-asc">最早创建</option>
+                        <option value="cookingTime-asc">烹饪时间从短到长</option>
+                        <option value="cookingTime-desc">烹饪时间从长到短</option>
+                        <option value="calories-asc">卡路里从低到高</option>
+                        <option value="calories-desc">卡路里从高到低</option>
+                        <option value="name-asc">名称A-Z</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- 菜谱网格 -->
+            <section class="recipe-grid" id="recipeGrid">
+                <!-- 菜谱卡片将在这里动态生成 -->
+            </section>
+
+            <!-- 空状态 -->
+            <section class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-illustration">
+                    <img src="./assets/images/empty-cooking-illustration.jpg" alt="空状态" class="empty-image">
+                </div>
+                <h3>还没有菜谱呢</h3>
+                <p>开始添加你的第一道虾蛋料理吧！</p>
+                <button class="empty-add-btn" onclick="document.getElementById('addRecipeBtn').click()">
+                    立即添加
+                </button>
+            </section>
+        </div>
+    </main>
+
+    <!-- 添加/编辑菜谱模态框 -->
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加新菜谱</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="recipeForm" class="recipe-form">
+                <div class="form-group">
+                    <label for="recipeName">菜名 *</label>
+                    <input type="text" id="recipeName" required maxlength="50" placeholder="请输入菜名">
+                </div>
+
+                <div class="form-group">
+                    <label>菜品图片</label>
+                    <div class="image-upload-area" id="imageUploadArea">
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                        <div class="upload-placeholder" id="uploadPlaceholder">
+                            <div class="upload-icon">📸</div>
+                            <p>点击或拖拽上传图片</p>
+                            <small>支持 JPG、PNG、GIF，最大 10MB</small>
+                        </div>
+                        <div class="image-preview" id="imagePreview" style="display: none;">
+                            <img id="previewImage" src="" alt="预览">
+                            <button type="button" class="remove-image" id="removeImage">×</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>用料清单 *</label>
+                    <div class="ingredients-list" id="ingredientsList">
+                        <div class="ingredient-item">
+                            <input type="text" placeholder="食材名称" class="ingredient-name" required>
+                            <input type="text" placeholder="用量" class="ingredient-amount" required>
+                            <button type="button" class="remove-ingredient" onclick="this.parentElement.remove()">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-ingredient-btn" onclick="addIngredient()">
+                        + 添加食材
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="instructions">详细做法 *</label>
+                    <textarea id="instructions" required rows="6" placeholder="请详细描述烹饪步骤..."></textarea>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cookingTime">烹饪时长（分钟）*</label>
+                        <input type="number" id="cookingTime" required min="1" placeholder="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="calories">卡路里（千卡）</label>
+                        <input type="number" id="calories" min="0" placeholder="可选">
+                    </div>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-secondary" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn-primary" id="saveBtn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 菜谱详情模态框 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content detail-modal">
+            <div class="modal-header">
+                <h2 id="detailTitle"></h2>
+                <button class="close-btn" id="closeDetail">&times;</button>
+            </div>
+            <div class="detail-content" id="detailContent">
+                <!-- 详情内容将动态生成 -->
+            </div>
+            <div class="detail-actions">
+                <button class="btn-secondary" id="editBtn">编辑</button>
+                <button class="btn-danger" id="deleteBtn">删除</button>
+                <button class="btn-primary" id="backBtn">返回</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认对话框 -->
+    <div class="modal" id="deleteConfirmModal">
+        <div class="modal-content confirm-modal">
+            <h3>确认删除</h3>
+            <p>确定要删除这个菜谱吗？此操作无法撤销。</p>
+            <div class="confirm-actions">
+                <button class="btn-secondary" id="cancelDelete">取消</button>
+                <button class="btn-danger" id="confirmDelete">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 加载动画 -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>加载中...</p>
+        </div>
+    </div>
+
+    <!-- JavaScript模块 -->
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
