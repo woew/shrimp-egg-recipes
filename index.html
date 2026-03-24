@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>虾蛋菜谱大全 - 可爱动漫风格菜谱管理</title>
+    <meta name="description" content="一个可爱动漫风格的虾蛋菜谱管理网站，轻松记录和分享美味的虾蛋料理">
+    <link rel="stylesheet" href="./assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 头部区域 -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <h1>🦐🥚 虾蛋菜谱大全</h1>
+                </div>
+                <button class="add-btn" id="addRecipeBtn">
+                    <span class="btn-icon">+</span>
+                    添加菜谱
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主内容区域 -->
+    <main class="main">
+        <div class="container">
+            <!-- 搜索和筛选区域 -->
+            <div class="controls">
+                <div class="search-bar">
+                    <input type="text" id="searchInput" placeholder="搜索菜谱名称..." class="search-input">
+                    <span class="search-icon">🔍</span>
+                </div>
+                <div class="sort-controls">
+                    <select id="sortSelect" class="sort-select">
+                        <option value="createdAt-desc">最新创建</option>
+                        <option value="createdAt-asc">最早创建</option>
+                        <option value="cookingTime-asc">用时最短</option>
+                        <option value="cookingTime-desc">用时最长</option>
+                        <option value="name-asc">名称A-Z</option>
+                        <option value="name-desc">名称Z-A</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 菜谱网格 -->
+            <div class="recipe-grid" id="recipeGrid">
+                <!-- 菜谱卡片将通过JavaScript动态生成 -->
+            </div>
+
+            <!-- 空状态提示 -->
+            <div class="empty-state" id="emptyState" style="display: none;">
+                <div class="empty-icon">🍳</div>
+                <h3>还没有菜谱呢</h3>
+                <p>点击"添加菜谱"按钮开始创建你的第一个虾蛋料理吧！</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- 添加/编辑菜谱模态框 -->
+    <div class="modal" id="recipeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">添加新菜谱</h2>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            <form id="recipeForm" class="recipe-form">
+                <div class="form-group">
+                    <label for="recipeName">菜名 *</label>
+                    <input type="text" id="recipeName" name="name" required maxlength="50" placeholder="请输入菜名">
+                </div>
+
+                <div class="form-group">
+                    <label for="recipeImage">菜品图片</label>
+                    <div class="image-upload">
+                        <input type="file" id="recipeImage" name="image" accept="image/*">
+                        <div class="image-preview" id="imagePreview">
+                            <div class="upload-placeholder">
+                                <span class="upload-icon">📷</span>
+                                <p>点击或拖拽上传图片</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="cookingTime">烹饪时长 *（分钟）</label>
+                        <input type="number" id="cookingTime" name="cookingTime" required min="1" placeholder="30">
+                    </div>
+                    <div class="form-group">
+                        <label for="calories">卡路里（千卡）</label>
+                        <input type="number" id="calories" name="calories" min="0" placeholder="250">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>用料清单 *</label>
+                    <div class="ingredients-list" id="ingredientsList">
+                        <div class="ingredient-item">
+                            <input type="text" placeholder="食材名称" class="ingredient-name" required>
+                            <input type="text" placeholder="用量" class="ingredient-amount" required>
+                            <button type="button" class="remove-ingredient" onclick="removeIngredient(this)">×</button>
+                        </div>
+                    </div>
+                    <button type="button" class="add-ingredient-btn" onclick="addIngredient()">
+                        <span>+</span> 添加用料
+                    </button>
+                </div>
+
+                <div class="form-group">
+                    <label for="instructions">详细做法 *</label>
+                    <textarea id="instructions" name="instructions" required rows="6" placeholder="请详细描述制作步骤，可以分行书写"></textarea>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn btn-secondary" id="cancelBtn">取消</button>
+                    <button type="submit" class="btn btn-primary" id="saveBtn">保存</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- 菜谱详情模态框 -->
+    <div class="modal" id="detailModal">
+        <div class="modal-content detail-modal">
+            <div class="modal-header">
+                <h2 id="detailTitle">菜谱详情</h2>
+                <button class="close-btn" id="closeDetail">&times;</button>
+            </div>
+            <div class="detail-content" id="detailContent">
+                <!-- 详情内容将通过JavaScript动态生成 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 数据管理区域 -->
+    <div class="data-controls">
+        <button class="btn btn-outline" id="exportBtn">导出数据</button>
+        <button class="btn btn-outline" id="importBtn">导入数据</button>
+        <input type="file" id="importFile" accept=".json" style="display: none;">
+    </div>
+
+    <!-- Toast提示 -->
+    <div class="toast" id="toast"></div>
+
+    <!-- 加载动画 -->
+    <div class="loading" id="loading" style="display: none;">
+        <div class="loading-spinner"></div>
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
+</html>
